@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <form action="/confirmar" method="post">
+        <h1>CONFIRME SEU AGENDAMENTO</h1>
+
+        {% if nome_dia %}
+            <p>Dia escolhido: {{ nome_dia }}</p>
+        {% endif %}
+
+        {% if data %}
+            <p>Data escolhida: {{ data }}</p>
+        {% endif %}
+
+        <!-- campos ocultos para enviar dia e data ao confirmar -->
+        <input type="hidden" name="dia" value="{{ dia }}">
+        <input type="hidden" name="data" value="{{ data }}">
+
+        <label>Nome:</label>
+        <input type="text" name="nome" required>
+        <br><br>
+
+        <label>Horário:</label>
+        <select name="horario">
+            {% for horario in horarios %}
+                <option value="{{ horario }}">{{ horario }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+
+        <label>Telefone:</label>
+        <input type="text" name="telefone" required>
+        <br><br>
+
+        <label>Serviço:</label>
+        <select name="servico">
+            <option>Corte</option>
+            <option>Barba</option>
+            <option>Corte + Barba</option>
+        </select>
+        <br><br>
+
+        <button type="submit">Confirmar horário</button>
+    </form>
+</body>
+</html>

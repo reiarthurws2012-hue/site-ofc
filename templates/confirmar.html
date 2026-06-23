@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>confirmar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Horário confirmado!</h1>
+
+    <p>Nome: {{ nome }}</p>
+    <p>Dia: {{ dia }}</p>
+    <p>Data: {{ data }}</p>
+    <p>Horário: {{ horario }}</p>
+    <p>Serviço: {{ servico }}</p>
+
+    <a href="/">Voltar para a página inicial</a>
+</body>
+</html>

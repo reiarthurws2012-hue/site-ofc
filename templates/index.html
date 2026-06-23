@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santana barber</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>BEM VINDO À SANTANA BARBER</h1>
+    <h2>servisos</h2>
+    <ul>
+        
+        <li>Corte de cabelo: R$30,00</li>
+        <li>Máquina: R$25,00</li>
+        <li>Barba: R$30,00</li>
+        <li>Corte + barba: R$55,00</li>
+    </ul>
+
+    <img src="{{ url_for('static', filename='WhatsApp Image 2026-06-19 at 15.18.56.jpeg') }}"
+         width="200" height="200" alt="Imagem de barbearia">
+   <form action="/agendar" method="post">
+    <label for="dia">Dia da semana:</label>
+    <select name="dia" id="dia" onchange="diaParaData()">
+        <option value="">-- selecione --</option>
+        <option value="1">Segunda-feira</option>
+        <option value="2">Terça-feira</option>
+        <option value="3">Quarta-feira</option>
+        <option value="4">Quinta-feira</option>
+        <option value="5">Sexta-feira</option>
+        <option value="6">Sábado</option>
+    </select>
+
+    <label for="data">Data:</label>
+    <input type="date" name="data" id="data" onchange="dataParaDia()">
+
+    <button type="submit">Agendar</button>
+</form>
+
+<script>
+    // Quando escolhe o dia, acha a próxima data desse dia da semana
+    function diaParaData() {
+        const diaSelecionado = parseInt(document.getElementById("dia").value);
+        if (!diaSelecionado) return;
+
+        const hoje = new Date();
+        const diaHoje = hoje.getDay(); // 0=dom, 1=seg...
+
+        let diff = diaSelecionado - diaHoje;
+        if (diff <= 0) diff += 7; // se já passou, vai pra semana que vem
+
+        const proximaData = new Date(hoje);
+        proximaData.setDate(hoje.getDate() + diff);
+
+        // Formata pra YYYY-MM-DD que o input date precisa
+        const ano = proximaData.getFullYear();
+        const mes = String(proximaData.getMonth() + 1).padStart(2, "0");
+        const dia = String(proximaData.getDate()).padStart(2, "0");
+
+        document.getElementById("data").value = `${ano}-${mes}-${dia}`;
+    }
+
+    // Quando escolhe a data, mostra o dia da semana no select
+    function dataParaDia() {
+        const dataValor = document.getElementById("data").value;
+        if (!dataValor) return;
+
+        const data = new Date(dataValor + "T00:00:00"); // evita fuso horário
+        const diaDaSemana = data.getDay(); // 0=dom, 1=seg...
+
+        document.getElementById("dia").value = diaDaSemana;
+    }
+</script> 
+</body>
+</html>
+
+
+
+
+
+
