@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contatos - Santana Barber</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>ENTRE EM CONTATO</h1>
+        
+        <p>Fique à vontade para nos contactar através dos canais abaixo:</p>
+
+        <div class="contatos-section">
+            <!-- Caminho 1: Email direto -->
+            <div class="contato-card">
+                <h2>📧 Email</h2>
+                <p>Entre em contato conosco via email:</p>
+                <button type="button" class="btn-contato" onclick="enviarEmail()">
+                    Enviar Email
+                </button>
+                <p class="nota" id="email-info"></p>
+            </div>
+
+            <!-- Caminho 2: Formulário de contato -->
+            <div class="contato-card">
+                <h2>💬 Formulário de Contato</h2>
+                <p>Preencha o formulário e entraremos em contato:</p>
+                <form method="POST" action="/enviar-contato">
+                    <label for="nome">Nome:</label>
+                    <input type="text" id="nome" name="nome" required>
+
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+
+                    <label for="telefone">Telefone:</label>
+                    <input type="tel" id="telefone" name="telefone" placeholder="(XX) XXXXX-XXXX">
+
+                    <label for="assunto">Assunto:</label>
+                    <input type="text" id="assunto" name="assunto" required>
+
+                    <label for="mensagem">Mensagem:</label>
+                    <textarea id="mensagem" name="mensagem" rows="5" required></textarea>
+
+                    <button type="submit" class="btn-contato">Enviar Mensagem</button>
+                </form>
+                
+            </div>
+        </div>
+
+        <a href="/" class="btn-voltar">← Voltar para Home</a>
+    </div>
+
+    <style>
+        .contatos-section {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+
+        .contato-card {
+            flex: 1;
+            min-width: 250px;
+            padding: 20px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+
+        .contato-card h2 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .btn-contato {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 10px 0;
+            transition: background-color 0.3s;
+        }
+
+        .btn-contato:hover {
+            background-color: #555;
+        }
+
+        .nota {
+            font-size: 0.85em;
+            color: #666;
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        .btn-voltar {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #666;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-voltar:hover {
+            background-color: #888;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 8px;
+            font-family: Arial, sans-serif;
+            resize: vertical;
+        }
+
+        input, textarea {
+            margin-bottom: 10px;
+        }
+    </style>
+
+    <script>
+        function enviarEmail() {
+            const email = "reiarthurws2012@gmail.com";
+            const assunto = "Contato - Santana Barber";
+            const body = "Olá, gostaria de entrar em contato com a Santana Barber.";
+            
+            // Tenta abrir o cliente de email
+            const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(body)}`;
+            window.location.href = mailtoLink;
+            
+            // Se o mailto não funcionar, mostra o email para copiar
+            setTimeout(() => {
+                document.getElementById('email-info').innerHTML = 
+                    `📧 Se o email não abriu, copie este endereço: <strong>${email}</strong> e diga que veio do site`;
+            }, 500);
+        }
+    </script>
+</body>
+</html>

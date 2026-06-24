@@ -210,6 +210,41 @@ def confirmar():
         return redirect('/')
 
 
+@app.route('/contatos')
+def contatos():
+    """Página de contatos"""
+    return render_template('contatos.html')
+
+
+@app.route('/enviar-contato', methods=['POST'])
+def enviar_contato():
+    """Processa o formulário de contato"""
+    try:
+        nome = request.form.get('nome', '').strip()
+        email = request.form.get('email', '').strip()
+        telefone = request.form.get('telefone', '').strip()
+        assunto = request.form.get('assunto', '').strip()
+        mensagem = request.form.get('mensagem', '').strip()
+        
+        # Validações básicas
+        if not nome or not email or not assunto or not mensagem:
+            flash('❌ Por favor, preencha todos os campos obrigatórios!', 'error')
+            return redirect('/contatos')
+        
+        # TODO: Implemente aqui a lógica de envio de email
+        # Exemplos de tags para redirecionamento:
+        # 1. Enviar para email definido: implementar com smtp
+        # 2. Redirecionar para WhatsApp: https://wa.me/55XX9XXXXXXXX
+        # 3. Redirecionar para Telegram: https://t.me/seu_usuario
+        # 4. Salvar em banco de dados
+        
+        flash(f'✅ Mensagem recebida! Obrigado {nome}, entraremos em contato em breve!', 'success')
+        return redirect('/contatos')
+    except Exception as e:
+        flash(f'❌ Erro ao enviar mensagem: {str(e)}', 'error')
+        return redirect('/contatos')
+
+
 if __name__ == '__main__':
     init_db()
     app.run(debug=True, host='localhost', port=5000)
