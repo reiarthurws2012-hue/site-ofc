@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from datetime import datetime, timedelta
 import sqlite3
 import os
@@ -45,8 +45,8 @@ def init_db():
 
 
 def validar_telefone(telefone):
-    """Valida formato do telefone: (XX) XXXXX-XXXX"""
-    padrao = r'^\(\d{2}\)\s\d{4,5}-\d{4}$'
+    """Valida formato do telefone: XX XXXXX-XXXX"""
+    padrao = r'^\d{2}\s\d{4,5}-\d{4}$'
     return re.match(padrao, telefone) is not None
 
 
@@ -168,7 +168,7 @@ def confirmar():
             return redirect('/')
         
         if not validar_telefone(telefone):
-            flash('❌ Telefone inválido! Formato: (XX) XXXXX-XXXX', 'error')
+            flash('❌ Telefone inválido! Formato: XX XXXXX-XXXX', 'error')
             return redirect('/')
         
         if not data or not validar_data(data):
@@ -243,6 +243,73 @@ def enviar_contato():
     except Exception as e:
         flash(f'❌ Erro ao enviar mensagem: {str(e)}', 'error')
         return redirect('/contatos')
+
+
+def is_admin_logged_in():
+    return session.get('admin_logged_in', False)
+
+
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    """Login do painel de administração"""
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+        senha = request.form.get('senha', '').strip()
+
+        admin_email = 'rsantana.rsantana@gmail.com'
+        admin_password = '441404'
+
+        if email == admin_email and senha == admin_password:
+            session['admin_logged_in'] = True
+            session['admin_email'] = admin_email
+            return redirect(url_for('admin_dashboard'))
+
+        flash('❌ Email ou senha incorretos!', 'error')
+        return redirect('/admin')
+
+    if is_admin_logged_in():
+        return redirect(url_for('admin_dashboard'))
+
+    return render_template('admin_login.html')
+
+
+@app.route('/admin/dashboard')
+def admin_dashboard():
+    """Exibe o painel de agendamentos"""
+    if not is_admin_logged_in():
+        flash('⚠️ Necessário login para acessar o painel de administração.', 'error')
+        return redirect(url_for('admin'))
+
+    conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM agendamentos ORDER BY data, horario')
+    agendamentos = cursor.fetchall()
+    conn.close()
+
+    agendamentos_formatados = []
+    for row in agendamentos:
+        agendamentos_formatados.append({
+            'id': row['id'],
+            'nome': row['nome'],
+            'telefone': row['telefone'],
+            'servico': row['servico'],
+            'data': row['data'],
+            'horario': row['horario'],
+            'dia_semana': DIAS_SEMANA.get(row['dia_semana'], 'Desconhecido'),
+            'data_criacao': row['data_criacao']
+        })
+
+    return render_template('admin_dashboard.html', agendamentos=agendamentos_formatados)
+
+
+@app.route('/admin/sair')
+def admin_logout():
+    """Sai da sessão do admin e volta para a página de login"""
+    session.pop('admin_logged_in', None)
+    session.pop('admin_email', None)
+    flash('Você saiu do painel de administração.', 'success')
+    return redirect('/admin')
 
 
 if __name__ == '__main__':

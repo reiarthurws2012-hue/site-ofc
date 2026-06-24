@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Santana Barber</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Painel de Administração</h1>
+        <p>Aqui estão os agendamentos cadastrados.</p>
+
+        {% if agendamentos %}
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Telefone</th>
+                        <th>Serviço</th>
+                        <th>Data</th>
+                        <th>Horário</th>
+                        <th>Dia</th>
+                        <th>Criado em</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for agendamento in agendamentos %}
+                        <tr>
+                            <td>{{ agendamento['id'] }}</td>
+                            <td>{{ agendamento['nome'] }}</td>
+                            <td>{{ agendamento['telefone'] }}</td>
+                            <td>{{ agendamento['servico'] }}</td>
+                            <td>{{ agendamento['data'] }}</td>
+                            <td>{{ agendamento['horario'] }}</td>
+                            <td>{{ agendamento['dia_semana'] }}</td>
+                            <td>{{ agendamento['data_criacao'] }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>Nenhum agendamento encontrado.</p>
+        {% endif %}
+
+        <a href="/admin/sair" class="btn-voltar">Sair</a>
+    </div>
+
+    <style>
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .admin-table th,
+        .admin-table td {
+            border: 1px solid #333;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .admin-table th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</body>
+</html>
