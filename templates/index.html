@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,19 +7,30 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>BEM VINDO À SANTANA BARBER</h1>
-    <h2>servisos</h2>
-    <ul>
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {% if category == 'error' %}error{% else %}success{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <h1>BEM VINDO À SANTANA BARBER</h1>
         
-        <li>Corte de cabelo: R$30,00</li>
-        <li>Máquina: R$25,00</li>
-        <li>Barba: R$30,00</li>
-        <li>Corte + barba: R$55,00</li>
-    </ul>
+        <h2>Serviços</h2>
+        <ul>
+            <li>Corte de cabelo: R$30,00</li>
+            <li>Máquina: R$25,00</li>
+            <li>Barba: R$30,00</li>
+            <li>Corte + barba: R$55,00</li>
+        </ul>
 
-    <img src="{{ url_for('static', filename='WhatsApp Image 2026-06-19 at 15.18.56.jpeg') }}"
-         width="200" height="200" alt="Imagem de barbearia">
-   <form action="/agendar" method="post">
+        <img src="{{ url_for('static', filename='WhatsApp Image 2026-06-19 at 15.18.56.jpeg') }}"
+             width="200" height="200" alt="Imagem de barbearia">
+        
+        <form action="/agendar" method="post">
     <label for="dia">Dia da semana:</label>
     <select name="dia" id="dia" onchange="diaParaData()">
         <option value="">-- selecione --</option>
@@ -71,6 +82,7 @@
         document.getElementById("dia").value = diaDaSemana;
     }
 </script> 
+    </div>
 </body>
 </html>
 

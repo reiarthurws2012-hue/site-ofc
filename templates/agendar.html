@@ -7,46 +7,66 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <form action="/confirmar" method="post">
-        <h1>CONFIRME SEU AGENDAMENTO</h1>
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {% if category == 'error' %}error{% else %}success{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form action="/confirmar" method="post">
+            <h1>CONFIRME SEU AGENDAMENTO</h1>
 
-        {% if nome_dia %}
-            <p>Dia escolhido: {{ nome_dia }}</p>
-        {% endif %}
+            {% if nome_dia %}
+                <p><strong>Dia escolhido:</strong> {{ nome_dia }}</p>
+            {% endif %}
 
-        {% if data %}
-            <p>Data escolhida: {{ data }}</p>
-        {% endif %}
+            {% if data %}
+                <p><strong>Data escolhida:</strong> {{ data }}</p>
+            {% endif %}
 
         <!-- campos ocultos para enviar dia e data ao confirmar -->
         <input type="hidden" name="dia" value="{{ dia }}">
         <input type="hidden" name="data" value="{{ data }}">
 
         <label>Nome:</label>
-        <input type="text" name="nome" required>
-        <br><br>
-
-        <label>Horário:</label>
-        <select name="horario">
-            {% for horario in horarios %}
-                <option value="{{ horario }}">{{ horario }}</option>
-            {% endfor %}
-        </select>
-        <br><br>
+        <input type="text" name="nome" placeholder="Digite seu nome completo" required>
 
         <label>Telefone:</label>
-        <input type="text" name="telefone" required>
-        <br><br>
+        <input type="tel" name="telefone" placeholder="(XX) XXXXX-XXXX" pattern="\(\d{2}\)\s\d{4,5}-\d{4}" required title="Formato: (XX) XXXXX-XXXX">
+
+        <label>Horário:</label>
+        {% if horarios %}
+            <select name="horario" required>
+                <option value="">-- selecione um horário --</option>
+                {% for horario in horarios %}
+                    <option value="{{ horario }}">{{ horario }}</option>
+                {% endfor %}
+            </select>
+        {% else %}
+            <div class="empty-horarios">
+                <strong>⚠️ Nenhum horário disponível para esta data!</strong> 
+                <br>Escolha outra data.
+            </div>
+            <a href="/" class="button button-margin-top">Voltar e escolher outra data</a>
+        {% endif %}
 
         <label>Serviço:</label>
-        <select name="servico">
-            <option>Corte</option>
-            <option>Barba</option>
-            <option>Corte + Barba</option>
+        <select name="servico" required>
+            <option value="">-- selecione um serviço --</option>
+            <option value="Corte">Corte de cabelo: R$30,00</option>
+            <option value="Máquina">Máquina: R$25,00</option>
+            <option value="Barba">Barba: R$30,00</option>
+            <option value="Corte + Barba">Corte + Barba: R$55,00</option>
         </select>
-        <br><br>
 
-        <button type="submit">Confirmar horário</button>
+        {% if horarios %}
+            <button type="submit">Confirmar horário</button>
+        {% endif %}
     </form>
+    </div>
 </body>
 </html>

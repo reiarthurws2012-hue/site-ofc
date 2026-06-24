@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,14 +7,19 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Horário confirmado!</h1>
+    <div class="container">
+        <h1>Horário confirmado!</h1>
 
-    <p>Nome: {{ nome }}</p>
-    <p>Dia: {{ dia }}</p>
-    <p>Data: {{ data }}</p>
-    <p>Horário: {{ horario }}</p>
-    <p>Serviço: {{ servico }}</p>
+        <div class="confirmation">
+            <p><strong>Nome:</strong> {{ nome }}</p>
+            <p><strong>Telefone:</strong> {{ telefone }}</p>
+            <p><strong>Dia:</strong> {{ dia }}</p>
+            <p><strong>Data:</strong> {{ data }}</p>
+            <p><strong>Horário:</strong> {{ horario }}</p>
+            <p><strong>Serviço:</strong> {{ servico }}</p>
+        </div>
 
-    <a href="/">Voltar para a página inicial</a>
+        <a href="/" class="button">Voltar para a página inicial</a>
+    </div>
 </body>
 </html>

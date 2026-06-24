@@ -1,9 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from datetime import datetime, timedelta
 import sqlite3
 import os
+import re
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
+app.secret_key = 'sua_chave_secreta_aqui'  # Necessário para flash messages
 
 # Mapa de dias da semana
 DIAS_SEMANA = {
@@ -34,11 +36,33 @@ def init_db():
                 data DATE NOT NULL,
                 horario TIME NOT NULL,
                 dia_semana INTEGER NOT NULL,
-                data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(data, horario)
             )
         ''')
         conn.commit()
         conn.close()
+
+
+def validar_telefone(telefone):
+    """Valida formato do telefone: (XX) XXXXX-XXXX"""
+    padrao = r'^\(\d{2}\)\s\d{4,5}-\d{4}$'
+    return re.match(padrao, telefone) is not None
+
+
+def validar_nome(nome):
+    """Valida se o nome tem pelo menos 3 caracteres"""
+    return nome and len(nome.strip()) >= 3
+
+
+def validar_data(data_str):
+    """Valida se a data não é no passado e é válida"""
+    try:
+        data = datetime.strptime(data_str, '%Y-%m-%d').date()
+        hoje = datetime.now().date()
+        return data >= hoje
+    except:
+        return False
 
 
 def gerar_horarios(dia_semana):
@@ -88,52 +112,102 @@ def index():
 @app.route('/agendar', methods=['POST'])
 def agendar():
     """Página de agendamento"""
-    dia = request.form.get('dia')
-    data = request.form.get('data')
-    
-    # Converte o número do dia para o nome
-    nome_dia = DIAS_SEMANA.get(int(dia)) if dia else None
-    
-    # Obtém horários disponíveis para essa data
-    dia_semana = int(dia) if dia else 0
-    horarios = horarios_disponiveis(data, dia_semana)
-    
-    return render_template('agendar.html', 
-                          nome_dia=nome_dia, 
-                          data=data, 
-                          dia=dia,
-                          horarios=horarios)
+    try:
+        dia = request.form.get('dia', '').strip()
+        data = request.form.get('data', '').strip()
+        
+        # Validações
+        if not dia or not data:
+            flash('❌ Por favor, selecione dia e data!', 'error')
+            return redirect('/')
+        
+        if not validar_data(data):
+            flash('❌ Data inválida ou no passado!', 'error')
+            return redirect('/')
+        
+        dia_semana = int(dia)
+        
+        # Valida se o dia selecionado corresponde à data
+        data_obj = datetime.strptime(data, '%Y-%m-%d').date()
+        if data_obj.weekday() + 1 != dia_semana and not (dia_semana == 6 and data_obj.weekday() == 6):
+            # Ajuste para domingo (0)
+            if not (dia_semana == 0 and data_obj.weekday() == 6):
+                flash('❌ Dia e data não correspondem!', 'error')
+                return redirect('/')
+        
+        # Converte o número do dia para o nome
+        nome_dia = DIAS_SEMANA.get(dia_semana)
+        
+        # Obtém horários disponíveis para essa data
+        horarios = horarios_disponiveis(data, dia_semana)
+        
+        return render_template('agendar.html', 
+                              nome_dia=nome_dia, 
+                              data=data, 
+                              dia=dia,
+                              horarios=horarios)
+    except Exception as e:
+        flash(f'❌ Erro ao processar agendamento: {str(e)}', 'error')
+        return redirect('/')
 
 
 @app.route('/confirmar', methods=['POST'])
 def confirmar():
     """Página de confirmação"""
-    nome = request.form.get('nome')
-    dia = request.form.get('dia')
-    data = request.form.get('data')
-    horario = request.form.get('horario')
-    servico = request.form.get('servico')
-    telefone = request.form.get('telefone')
-    
-    # Salva no banco de dados
-    conn = sqlite3.connect(DATABASE)
-    cursor = conn.cursor()
-    cursor.execute('''
-        INSERT INTO agendamentos (nome, telefone, servico, data, horario, dia_semana)
-        VALUES (?, ?, ?, ?, ?, ?)
-    ''', (nome, telefone, servico, data, horario, int(dia)))
-    conn.commit()
-    conn.close()
-    
-    # Converte o número do dia para o nome
-    nome_dia = DIAS_SEMANA.get(int(dia)) if dia else None
-    
-    return render_template('confirmar.html',
-                          nome=nome,
-                          dia=nome_dia,
-                          data=data,
-                          horario=horario,
-                          servico=servico)
+    try:
+        nome = request.form.get('nome', '').strip()
+        dia = request.form.get('dia', '').strip()
+        data = request.form.get('data', '').strip()
+        horario = request.form.get('horario', '').strip()
+        servico = request.form.get('servico', '').strip()
+        telefone = request.form.get('telefone', '').strip()
+        
+        # Validações
+        if not validar_nome(nome):
+            flash('❌ Nome inválido (mínimo 3 caracteres)!', 'error')
+            return redirect('/')
+        
+        if not validar_telefone(telefone):
+            flash('❌ Telefone inválido! Formato: (XX) XXXXX-XXXX', 'error')
+            return redirect('/')
+        
+        if not data or not validar_data(data):
+            flash('❌ Data inválida!', 'error')
+            return redirect('/')
+        
+        if not horario or not servico:
+            flash('❌ Selecione horário e serviço!', 'error')
+            return redirect('/')
+        
+        # Verifica se o horário ainda está disponível (proteção contra race condition)
+        conn = sqlite3.connect(DATABASE)
+        cursor = conn.cursor()
+        
+        try:
+            cursor.execute('''
+                INSERT INTO agendamentos (nome, telefone, servico, data, horario, dia_semana)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ''', (nome, telefone, servico, data, horario, int(dia)))
+            conn.commit()
+        except sqlite3.IntegrityError:
+            flash('❌ Este horário já foi reservado! Escolha outro.', 'error')
+            return redirect('/')
+        finally:
+            conn.close()
+        
+        # Converte o número do dia para o nome
+        nome_dia = DIAS_SEMANA.get(int(dia))
+        
+        return render_template('confirmar.html',
+                              nome=nome,
+                              dia=nome_dia,
+                              data=data,
+                              horario=horario,
+                              servico=servico,
+                              telefone=telefone)
+    except Exception as e:
+        flash(f'❌ Erro ao confirmar agendamento: {str(e)}', 'error')
+        return redirect('/')
 
 
 if __name__ == '__main__':
