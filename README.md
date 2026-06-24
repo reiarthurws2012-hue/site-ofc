@@ -6,6 +6,7 @@ Um sistema web de agendamentos para barbearia desenvolvido com Flask, HTML, CSS 
 
 ✅ **Agendamento online** - Clientes podem agendar via web  
 ✅ **Horários automáticos** - Gerados conforme dias da semana:
+
 - **Segunda a Sexta**: 18:30 às 21:00 (45 min de intervalo)
 - **Sábado**: 09:00 às 21:00 (45 min de intervalo)
 
@@ -30,11 +31,11 @@ pip install -r requirements.txt
 python app.py
 ```
 
-A aplicação estará disponível em: **http://localhost:5000**
+A aplicação estará disponível em: <http://localhost:5000>
 
 ## 📁 Estrutura do Projeto
 
-```
+```tree
 barbearia/
 ├── app.py                          # Aplicação Flask principal
 ├── requirements.txt                # Dependências do projeto
@@ -61,16 +62,16 @@ barbearia/
 
 Tabela `agendamentos`:
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | INTEGER | ID único (chave primária) |
-| nome | TEXT | Nome do cliente |
-| telefone | TEXT | Telefone de contato |
-| servico | TEXT | Serviço contratado |
-| data | DATE | Data do agendamento |
-| horario | TIME | Horário do agendamento |
-| dia_semana | INTEGER | Dia da semana (1-6, sem domingo) |
-| data_criacao | TIMESTAMP | Data/hora de criação do agendamento |
+| Campo        | Tipo      | Descrição                              |
+| ------------ | --------- | -------------------------------------- |
+| id           | INTEGER   | ID único (chave primária)              |
+| nome         | TEXT      | Nome do cliente                        |
+| telefone     | TEXT      | Telefone de contato                    |
+| servico      | TEXT      | Serviço contratado                     |
+| data         | DATE      | Data do agendamento                    |
+| horario      | TIME      | Horário do agendamento                 |
+| dia_semana   | INTEGER   | Dia da semana (1-6, sem domingo)       |
+| data_criacao | TIMESTAMP | Data/hora de criação do agendamento    |
 
 **Constraint**: `UNIQUE(data, horario)` - Impede agendamentos duplicados
 
@@ -84,12 +85,14 @@ Tabela `agendamentos`:
 ## 🔧 Melhorias Implementadas
 
 ### Segurança
+
 - Validação no servidor (não depende só do cliente)
 - Proteção contra SQL injection (uso de parâmetros)
 - Transações de banco de dados contra race conditions
 - Secret key para sessões Flask
 
 ### UX/UI
+
 - Mensagens de erro claras e visuais
 - Feedback em tempo real
 - Horários sem disponibilidade mostram aviso
@@ -97,6 +100,7 @@ Tabela `agendamentos`:
 - Botões "Voltar" para fácil navegação
 
 ### Funcionalidade
+
 - Agendamentos persistentes em banco de dados
 - Sincronização entre dia selecionado e data
 - Serviços com preços listados
@@ -105,6 +109,7 @@ Tabela `agendamentos`:
 ## 📱 Responsividade
 
 O site funciona perfeitamente em:
+
 - 📱 Celulares (até 480px)
 - 📱 Tablets (até 768px)
 - 💻 Desktops (acima de 768px)
@@ -118,7 +123,7 @@ O site funciona perfeitamente em:
 
 ## 📝 Exemplo de Uso
 
-1. Acesse http://localhost:5000
+1. Acesse <http://localhost:5000>
 2. Selecione dia da semana OU data
 3. Clique em "Agendar"
 4. Preencha nome, telefone, horário e serviço
@@ -127,16 +132,19 @@ O site funciona perfeitamente em:
 
 ## 🐛 Troubleshooting
 
-**Erro: "Port 5000 already in use"**
+### Erro: "Port 5000 already in use"
+
 ```bash
 python app.py  # Tenta porta 5001, 5002, etc
 ```
 
-**Erro: "Nenhum horário disponível"**
+### Erro: "Nenhum horário disponível"
+
 - Verifique se escolheu uma data válida
 - Horários esgotam quando todos são agendados
 
-**Banco de dados corrompido?**
+### Banco de dados corrompido?
+
 - Delete `agendamentos.db`
 - Reinicie a aplicação (banco será recriado)
 
@@ -146,4 +154,4 @@ Para melhorias ou dúvidas, abra uma issue!
 
 ---
 
-**Desenvolvido com ❤️ em Flask**
+Desenvolvido com ❤️ em Flask
